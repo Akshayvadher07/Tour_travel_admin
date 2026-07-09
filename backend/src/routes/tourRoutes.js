@@ -12,7 +12,7 @@ function requireAdmin(req, res, next) {
   const key = process.env.ADMIN_API_KEY;
   console.log("KEY:", JSON.stringify(key));
   console.log("PROVIDED:", JSON.stringify(req.get("x-admin-key")));
-  // ... rest of function
+  // ... rest of function}
 
 
 
