@@ -7,6 +7,15 @@ const { existsDestinationName } = require("../services/destinationService");
 const router = express.Router();
 const CATEGORIES = ["adventure", "cultural", "relaxation", "wildlife", "city"];
 
+
+function requireAdmin(req, res, next) {
+  const key = process.env.ADMIN_API_KEY;
+  console.log("KEY:", JSON.stringify(key));
+  console.log("PROVIDED:", JSON.stringify(req.get("x-admin-key")));
+  // ... rest of function
+
+
+
 function requireAdmin(req, res, next) {
   const key = process.env.ADMIN_API_KEY;
   if (!key || String(key).trim() === "") {
