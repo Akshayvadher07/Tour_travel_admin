@@ -7,17 +7,10 @@ const { existsDestinationName } = require("../services/destinationService");
 const router = express.Router();
 const CATEGORIES = ["adventure", "cultural", "relaxation", "wildlife", "city"];
 
-
 function requireAdmin(req, res, next) {
   const key = process.env.ADMIN_API_KEY;
   console.log("KEY:", JSON.stringify(key));
   console.log("PROVIDED:", JSON.stringify(req.get("x-admin-key")));
-  // ... rest of function}
-
-
-
-function requireAdmin(req, res, next) {
-  const key = process.env.ADMIN_API_KEY;
   if (!key || String(key).trim() === "") {
     if (process.env.NODE_ENV === "production") {
       return sendError(
@@ -49,21 +42,11 @@ function requireDatabase(_req, res, next) {
   next();
 }
 
-/**
- * Normalise the `images` field from a request body.
- *
- * Accepts either:
- *   - `images`  – array of URL strings  (new format)
- *   - `imageUrl` – single URL string    (legacy / backward-compat)
- *
- * Returns `null` when neither is usable.
- */
 function resolveImages(body) {
   if (Array.isArray(body.images) && body.images.length > 0) {
     const urls = body.images.map((u) => String(u).trim()).filter(Boolean);
     return urls.length > 0 ? urls : null;
   }
-  // fall back to legacy imageUrl
   if (body.imageUrl && String(body.imageUrl).trim() !== "") {
     return [String(body.imageUrl).trim()];
   }
@@ -72,7 +55,6 @@ function resolveImages(body) {
 
 router.use(requireDatabase);
 
-// ── POST /api/tours ──────────────────────────────────────────────────────────
 router.post("/", requireAdmin, async (req, res) => {
   try {
     const b = req.body && typeof req.body === "object" ? req.body : {};
@@ -148,7 +130,6 @@ router.post("/", requireAdmin, async (req, res) => {
   }
 });
 
-// ── GET /api/tours ───────────────────────────────────────────────────────────
 router.get(
   "/",
   (req, res, next) => {
@@ -164,9 +145,7 @@ router.get(
       const page = Math.max(1, parseInt(String(req.query.page), 10) || 1);
       const limit = Math.min(100, Math.max(1, parseInt(String(req.query.limit), 10) || 20));
       const { tours, totalDocuments, featuredCount } = await listTours({ includeDeleted, featured, page, limit });
-
       const totalPages = Math.max(1, Math.ceil(totalDocuments / limit));
-
       sendSuccess(
         res,
         tours,
@@ -191,7 +170,6 @@ router.get(
   }
 );
 
-// ── GET /api/tours/:id ───────────────────────────────────────────────────────
 router.get(
   "/:id",
   (req, res, next) => {
@@ -214,7 +192,6 @@ router.get(
   }
 );
 
-// ── PUT /api/tours/:id ───────────────────────────────────────────────────────
 router.put("/:id", requireAdmin, async (req, res) => {
   try {
     const b = req.body && typeof req.body === "object" ? req.body : {};
@@ -233,7 +210,6 @@ router.put("/:id", requireAdmin, async (req, res) => {
 
     if (b.description !== undefined) patch.description = String(b.description);
 
-    // Multi-image: accept `images` array or legacy `imageUrl`
     if (b.images !== undefined || b.imageUrl !== undefined) {
       const images = resolveImages(b);
       if (!images) {
